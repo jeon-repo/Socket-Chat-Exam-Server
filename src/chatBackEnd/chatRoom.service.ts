@@ -16,7 +16,8 @@ export class ChatRoomService {
     };
   }
   createChatRoom(client: Socket, roomName: string): void {
-    const roomId = `room:${uuidv4()}`;
+    // const roomId = `room:${uuidv4()}`;
+    const roomId = `room:${client.id}`;
     const nickname: string = client.data.nickname;
     client.emit('getMessage', {
       id: null,
@@ -36,8 +37,10 @@ export class ChatRoomService {
 
   enterChatRoom(client: Socket, roomId: string) {
     client.data.roomId = roomId;
-    client.rooms.clear();
+    // client가 여러개의 room에 못들어가게 클린하는 코드
+    // client.rooms.clear();
     client.join(roomId);
+    console.log('room client data -> ', client.data);
     const { nickname } = client.data;
     const { roomName } = this.getChatRoom(roomId);
     client.to(roomId).emit('getMessage', {
@@ -58,6 +61,10 @@ export class ChatRoomService {
       message: '"' + nickname + '"님이 방에서 나갔습니다.',
     });
   }
+
+  // getChatRoomMan(roomId: string): chatRoomListDTO {
+
+  // }
 
   getChatRoom(roomId: string): chatRoomListDTO {
     return this.chatRoomList[roomId];
